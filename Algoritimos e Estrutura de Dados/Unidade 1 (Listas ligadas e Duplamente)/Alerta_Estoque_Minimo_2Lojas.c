@@ -1,5 +1,5 @@
 /*******************************************************************************************
-Minha primeira Atividade da faculdade e primeiro contato com C, Então sim, dá pra refatorar, melhorar,
+Minha primeira Atividade da faculdade e primeiro contato com C, Então sim tem muito a melhorar, dá pra refatorar,
 diminuir códigos com funções, implementar novas funções como libera memória entre outras.
 Atividade pedia para criar com lista Ligada um controle de estoque que gerasse um relátório
 com produtos que estão abaixo do estoque mínimo 
@@ -7,7 +7,7 @@ em alguma das duas lojas, e imprimisse esses produtos na tela
 ***********************************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-
+//estrutura de um produto
 struct estoque{
     int loj;
     char produto[20];
@@ -62,6 +62,8 @@ int main()
     }while(opcao != 0);
     return 0;
 }
+
+//Exclui produto apontado pela função abaixo
 void deletando(Estoque** loja, int cod, int nloja){
     Estoque *atual=*loja;
     Estoque *anterior=NULL;
@@ -76,6 +78,9 @@ void deletando(Estoque** loja, int cod, int nloja){
     }else printf("\nProduto não encontrado na loja %d \n", nloja);   
     
 }
+
+//Função onde seleciona a loja e o produto que se deseja excluír
+//está sem verificação de lista vazia
 void produtDel(Estoque* loja1, Estoque* loja2){
     int nloja;
     int cod;
@@ -103,7 +108,10 @@ void produtDel(Estoque* loja1, Estoque* loja2){
     }
     
 }
+
+//Função para cadastrar novo item (sim, dava pra transformar esses while em função)
 void cadastraItem(Estoque* loja1, Estoque* loja2){
+    //aloca memória para novo produto cadastrado
     Estoque *novo = (Estoque*)malloc(sizeof(Estoque));
     novo->prox=NULL;
     int nloja;
@@ -134,17 +142,20 @@ void cadastraItem(Estoque* loja1, Estoque* loja2){
             novo->prox=NULL;
             break;
             }
+            //passa todas as informações de novo para novo1 e novo2, depois libera memoria de novo
             case 3:{
             Estoque *novo1 = (Estoque*)malloc(sizeof(Estoque));
             Estoque *novo2 = (Estoque*)malloc(sizeof(Estoque));
             *novo1 = *novo;
             *novo2= *novo;
             free(novo);
+                //cadastrando produto na loja1
             Estoque *atual=loja1;
             while(atual->prox!=NULL){
             atual = atual->prox;}
             atual->prox=novo1;
             novo1->prox=NULL;
+                //cadastrando produto na loja2
             Estoque *copia=loja2;
             while(copia->prox!=NULL){
             copia = copia->prox;}
@@ -157,6 +168,7 @@ void cadastraItem(Estoque* loja1, Estoque* loja2){
             break;
         }
 }
+//gera o relatorio percorrendo toda lista de cada loja e salvando em relEstoque
 void geraRelatorio(Estoque* loja, int nloja, Estoque* relEstoque){
     Estoque *lojaAtual = loja->prox;
     while(lojaAtual != NULL){
@@ -177,6 +189,10 @@ void geraRelatorio(Estoque* loja, int nloja, Estoque* relEstoque){
     
     
 }
+
+//imprime na tela o conteúdo de relEstoque e limpa o relatório
+//o correto seria produto sair do relatorio somente após ajustar estoque, mas
+//atividade pedia assim para trabalhar o free()
 void imprimeRel(Estoque* estbaixo){
     Estoque* atual = estbaixo->prox;
     Estoque* temp;
