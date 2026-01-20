@@ -26,13 +26,18 @@ void listando(Chamados *head, char crit1[MAX_STATUS], char crit2[MAX_STATUS]);
 void acessaChamado(Chamados *head);
 void solucionando(Chamados *head);
 void liberamemoria(Chamados *head);
+void atribuindo(Chamados *head, const char *tecnico);
+void fechandoChamado(Chamados *head);
 
 int main()
 {
     setlocale(LC_ALL, ".UTF-8");
+    char User[20];
     Chamados lista = {0};
     Chamados *Tail=&lista;
     printf("\nPrograma Gerenciador de Chamados\n");
+    printf("\nDigite Seu Nome\n");
+    scanf(" %s", User);
     int i = 999;
     int opcao;
     do{
@@ -41,6 +46,8 @@ int main()
         printf("2-Listar Chamados\n");
         printf("3-Acessar chamado\n");
         printf("4-Adicionar Solução\n");
+        printf("5-Atribuir Chamado\n");
+        printf("6-Fechar Chamado\n");
         printf("0-Sair\n");
         scanf("%d", &opcao);
         switch(opcao){
@@ -51,6 +58,10 @@ int main()
             case 3: acessaChamado(&lista); break;
 
             case 4: solucionando(&lista); break;
+
+            case 5: atribuindo(&lista, User); break;
+
+            case 6: fechandoChamado(&lista); break;
 
             case 0: liberamemoria(&lista); break;
 
@@ -65,8 +76,7 @@ int main()
 void abreChamado(Chamados *head, Chamados **tail, int *id){
     char titulo[MAX_TITULO];
     char descricao[MAX_DESCRICAO];
-    Chamados *novo =(Chamados*) malloc(sizeof(Chamados));
-    novo->prox=NULL;
+    Chamados *novo =(Chamados*)calloc(1, sizeof(Chamados));
     printf("\nTítulo: ");
     scanf(" %19[^\n]", titulo);
     printf("\nDescrição: ");
@@ -178,11 +188,12 @@ void solucionando(Chamados *head){
     strcpy(atual->solucao, "\nSolução: ");
     strcat(atual->solucao, solucao);
     strcpy(atual->status, "Solucionado");
-    printf("\nDigite seu nome: ");
-    scanf(" %s", tecnico);
-    strcpy(atual->tecnico, tecnico);
-    printf("Solução adicionada ao chamado %d.\n", id);
-
+    if(strcmp(atual->tecnico, "")==0){
+        printf("Digite seu nome (sem espaço):\n");
+        scanf(" %s", tecnico);
+        strcpy(atual->tecnico, tecnico);
+    }    
+    printf("Solução adicionada ao chamado %d pelo técnico %s.\n", id, atual->tecnico);    
 }
 //Função para liberar memória ao sair do progrmama
 void liberamemoria(Chamados *head){
@@ -196,3 +207,77 @@ void liberamemoria(Chamados *head){
     }
     printf("\nObrigado por usar nossos sistemas\n");
 }
+//Função P/ atribuir técnico ao chamado
+void atribuindo(Chamados *head, const char *tecnico){
+    if(head->prox == NULL){
+        printf("\nERRO! Ainda não existem chamados\n");
+        return;
+    }
+    Chamados *atual=head->prox;
+    int id;
+    int op;
+    const char opcao;
+    char user2[20];
+    printf("\nDigite o ID do chamado\n");
+    scanf(" %d", &id);
+    while(atual!=NULL && atual->id!=id){
+        atual=atual->prox;
+    }
+    if(atual==NULL){
+        printf("\nChamado Não encontrado, Digite 2 para visualizar os chamados\n");
+        return;
+    }
+    if(strcmp(atual->status, "Novo") != 0 && strcmp(atual->status, "Em Atendimento")!=0){
+        printf("\nJá existe uma solução para este chamado, Deseja continuar mesmo assim? (S/N)\n");
+        scanf(" %c", &opcao);
+        if(opcao=='N' || opcao=='n'){
+            printf("\nOperação cancelada\n");
+            return;
+        }
+    }
+    if(atual->id==id){
+        printf("\n1-Associar a mim mesmo");
+        printf("\n2-Associar a outro técnico");
+        scanf(" %d", &op);
+        switch(op){
+            case 1:
+            strcpy(atual->tecnico,tecnico);
+            break;
+
+            case 2:
+            printf("digite o nome do técnico, sem espaço");
+            scanf(" %s", user2);
+            strcpy(atual->tecnico,user2);
+            break;
+
+            default: printf("\nopção inválida\n");
+        }
+        strcpy(atual->status, "Em Atendimento");
+        printf("\nChamado %d %s pelo técnico %s\n", id, atual->titulo, atual->tecnico);
+    }
+}
+//Função para mudar o status do chamado para fechado
+void fechandoChamado(Chamados *head){
+    if(head->prox==NULL){
+        printf("\nNenhum chamado existente\n");
+        return;
+    }
+    int id;
+    Chamados *atual = head->prox;
+    printf("\nDigite o id do chamado para fechar:\nR: ");
+    scanf(" %d", &id);
+    while(atual != NULL && atual->id != id){
+        atual = atual->prox;
+    }
+    if(atual == NULL){
+        printf("Chamado não encontrado.\n");
+        return;
+    }
+    if(strcmp(atual->status, "Fechado") == 0){
+        printf("Chamado já está fechado.\n");
+        return;
+    }
+    strcpy(atual->status, "Fechado");
+    printf("Chamado %d fechado com sucesso.\n", id);    
+}
+//fim do programa
